@@ -3,6 +3,7 @@ package com.mercadopago.client.chargeback;
 import static com.mercadopago.MercadoPagoConfig.getStreamHandler;
 import static com.mercadopago.serialization.Serializer.deserializeFromJson;
 import static com.mercadopago.serialization.Serializer.deserializeResultsResourcesPageFromJson;
+import static com.mercadopago.serialization.Serializer.serializeToJson;
 
 import com.google.gson.reflect.TypeToken;
 import com.mercadopago.MercadoPagoConfig;
@@ -93,6 +94,42 @@ public class ChargebackClient extends MercadoPagoClient {
     Chargeback result = deserializeFromJson(Chargeback.class, response.getContent());
     result.setResponse(response);
     return result;
+  }
+
+  /**
+   * Updates the documentation files for a chargeback.
+   *
+   * @param id the unique identifier of the chargeback
+   * @param request the JSON request body containing the files to upload
+   * @return the HTTP response from the update request
+   * @throws MPException if a transport-level or SDK-internal error occurs
+   * @throws MPApiException if the API returns a non-successful HTTP status code
+   */
+  public MPResponse updateChargeback(String id, UpdateChargebackRequest request)
+      throws MPException, MPApiException {
+    return this.updateChargeback(id, request, null);
+  }
+
+  /**
+   * Updates the documentation files for a chargeback with custom request options.
+   *
+   * @param id the unique identifier of the chargeback
+   * @param request the JSON request body containing the files to upload
+   * @param requestOptions optional {@link MPRequestOptions}; may be {@code null}
+   * @return the HTTP response from the update request
+   * @throws MPException if a transport-level or SDK-internal error occurs
+   * @throws MPApiException if the API returns a non-successful HTTP status code
+   */
+  public MPResponse updateChargeback(
+      String id, UpdateChargebackRequest request, MPRequestOptions requestOptions)
+      throws MPException, MPApiException {
+    LOGGER.info("Sending update chargeback request");
+    return send(
+        String.format(URL_WITH_ID, id),
+        HttpMethod.PUT,
+        serializeToJson(request),
+        null,
+        requestOptions);
   }
 
   /**
